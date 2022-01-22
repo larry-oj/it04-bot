@@ -1,0 +1,27 @@
+{
+  "name": "bodya-voice-bot",
+  "version": "1.0.0",
+  "description": "telegram bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/larry-oj/bodya-voice-bot.git"
+  },
+  "author": "larry_oj",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/larry-oj/bodya-voice-bot/issues"
+  },
+  "homepage": "https://github.com/larry-oj/bodya-voice-bot#readme",
+  "devDependencies": {
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "pg": "^8.7.1",
+    "telegraf": "^4.6.0"
+  },
+  "type": "module"
+}
