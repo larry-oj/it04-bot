@@ -14,7 +14,7 @@ class DbRepo {
     }
 
     getUser(id, callback) {
-        this.#query(`SELECT * FROM public.user WHERE id = ${id};`, callback);
+        this.#query(`SELECT * FROM public.user WHERE id = \'${id}\';`, callback);
     }
 
     deleteUser(id, callback) {
