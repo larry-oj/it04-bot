@@ -43,7 +43,7 @@ bot.on('text', async (ctx) => {
     let args = ctx.message.text.split(/\s+/);
 
     // get command name
-    let command = args[0].toLowerCase().replace('/', '').replace('@it04bot', '');
+    let command = args[0].toLowerCase().replace('/', '').replace(as.telegram.bot_tag, '');
 
     commands.forEach(cmd => {
         if (cmd.cmd?.name == command) {
