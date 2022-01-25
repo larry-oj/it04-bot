@@ -43,7 +43,7 @@ bot.on('text', (ctx) => {
     let args = ctx.message.text.split(/\s+/);
 
     // get command name
-    let command = args[0].toLowerCase().replace('/', '');
+    let command = args[0].toLowerCase().replace('/', '').replace('@it04bot', '');
 
     commands.forEach(cmd => {
         if (cmd.cmd?.name == command) {
