@@ -35,7 +35,7 @@ const bot = new Telegraf(as.telegram.token);
 
 
 // react to text messages
-bot.on('text', (ctx) => {
+bot.on('text', async (ctx) => {
     // if not a command
     if (!ctx.message.text.startsWith('/')) return;
 
