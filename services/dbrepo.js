@@ -51,6 +51,12 @@ class DbRepo {
     getPairTimes(callback) {
         this.#query(`select * from public.pair_time;`, callback);
     }
+
+    addPair(week, day, pair, name, type, link, callback) {
+        this.#query(`insert into public.subject(name, type, link) values (\'${name}\', \'${type}\', \'${link == '*' ? null : link}\') returning *;`, (res, err) => {
+            this.#query(`insert into public.schedule(subject_id, week_num, day_num, pair_id) values (${res.rows[0].id}, ${week}, ${day}, ${pair});`, callback);
+        });
+    }
     //#endregion
 
 
