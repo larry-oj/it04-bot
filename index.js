@@ -2,6 +2,7 @@
 import * as fs from 'fs';
 import { Telegraf } from 'telegraf';
 import { as } from './appsettings.js';
+import { repo } from './services/dbrepo.js';
 import * as schedule from './services/schedule.js';
 // #endregion
 
@@ -38,6 +39,16 @@ schedule.init(bot, msgOps);
 
 // react to text messages
 bot.on('text', async (ctx) => {
+    // outsider protection
+    if (ctx.chat.id != as.telegram.group_chat_id) {
+        repo.getUser(ctx.from.id, (res, err) =>{
+            if (err || res == null || res.rows.length < 1) {
+                ctx.reply(`Sorry! I only work inside my group`);
+                return;
+            }
+        });
+    }
+
     // if not a command
     if (!ctx.message.text.startsWith('/')) return;
 
