@@ -2,6 +2,7 @@
 import * as fs from 'fs';
 import { Telegraf } from 'telegraf';
 import { as } from './appsettings.js';
+import * as schedule from './services/schedule.js';
 // #endregion
 
 
@@ -31,6 +32,7 @@ fs.readdir('./commands', (err, files) => {
 
 // #region initialize instances
 const bot = new Telegraf(as.telegram.token);
+schedule.init(bot, msgOps);
 // #endregion
 
 
