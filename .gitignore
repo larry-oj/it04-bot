@@ -5,6 +5,8 @@
 
 # Custom
 data/userdata.json
+.vscode
+tmp.sql
 
 # User-specific files
 *.rsuser
