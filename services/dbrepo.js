@@ -9,6 +9,7 @@ class DbRepo {
         this.pgContext.connect();
     }
 
+    //#region userdata
     addUser(id, callback) {
         this.#query(`INSERT INTO public.user(id) VALUES (\'${id}\');`, callback);
     }
@@ -24,6 +25,34 @@ class DbRepo {
     setUserSession(id, callback, commandSession = '', sessionData = '') {
         this.#query(`UPDATE public.user SET command_session = \'${commandSession}\', session_data = \'${sessionData}\' WHERE id = \'${id}\';`, callback)
     }
+    //#endregion
+
+
+    //#region schedule
+    changeWeek(callback) {
+        this.#query(`select * from public.week_num;`, (res, err) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            if (res.rows[0].num == 1) {
+                this.#query(`update public.week_num set num = 2 where num = 1;`, callback);
+            }
+            else {
+                this.#query(`update public.week_num set num = 1 where num = 2;`, callback);
+            }
+        });
+    }
+
+    getPair(week, day, num, callback) {
+        this.#query(`select subject.name, subject.type, subject.auditory, subject.link, subject.teacher from subject join schedule on schedule.subject_id = subject.id where schedule.week_num = ${week} and schedule.day_num = ${day} and schedule.pair_id = ${num} ;`, callback);
+    }
+
+    getPairTimes(callback) {
+        this.#query(`select * from public.pair_time;`, callback);
+    }
+    //#endregion
+
 
     #query(query, callback) {
         this.pgContext
