@@ -47,6 +47,10 @@ class DbRepo {
 
 
     //#region schedule
+    getWeek(callback) {
+        this.#query(`select * from public.week_num;`, callback);
+    }
+
     changeWeek() {
         this.#query(`select * from public.week_num;`, (res, err) => {
             if (err) {
