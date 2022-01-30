@@ -2,7 +2,7 @@ import { repo } from '../services/dbrepo.js';
 import { Schedule } from '../services/schedule.js';
 
 export const cmd = {
-    name: 'editpair',
+    name: 'edit',
     desc: 'Edit pair in schedule\\.',
     admin: true,
     execute: (ctx, msgOps) => {

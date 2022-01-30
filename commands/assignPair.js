@@ -1,7 +1,7 @@
 import { repo } from '../services/dbrepo.js';
 
 export const cmd = {
-    name: 'assignpair',
+    name: 'assign',
     desc: 'Assign pair to schedule\\.',
     admin: true,
     execute: (ctx, msgOps) => {
