@@ -70,15 +70,21 @@ class DbRepo {
         this.#query(`select subject.id, subject.name, subject.type, subject.auditory, subject.link, subject.teacher from subject join schedule on schedule.subject_id = subject.id where schedule.week_num = ${week} and schedule.day_num = ${day} and schedule.pair_id = ${num} ;`, callback);
     }
 
+    getAllPairs(callback) {
+        this.#query(`select * from public.subject;`, callback);
+    }
+
     getPairTimes(callback) {
         this.#query(`select * from public.pair_time;`, callback);
     }
 
-    addPair(week, day, pair, name, type, link, callback) {
-        this.#query(`insert into public.subject(name, type, link) values (\'${name}\', \'${type}\', \'${link == '*' ? null : link}\') returning *;`, (res, err) => {
-            this.#query(`insert into public.schedule(subject_id, week_num, day_num, pair_id) values (${res.rows[0].id}, ${week}, ${day}, ${pair});`, callback);
-        });
+    addPair(name, type, link, callback) {
+        this.#query(`insert into public.subject(name, type, link) values (\'${name}\', \'${type}\', \'${link == '*' ? null : link}\');`, callback);
     }
+
+    assignPair(week, day, pair, id, callback) {
+        this.#query(`insert into public.schedule(subject_id, week_num, day_num, pair_id) values (${id}, ${week}, ${day}, ${pair});`, callback);
+    } 
 
     editPair(id, name, type, link, callback) {
         let query = `update public.subject set`;
