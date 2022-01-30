@@ -41,10 +41,17 @@ schedule.init(bot, msgOps);
 bot.on('text', async (ctx) => {
     // outsider protection
     if (ctx.chat.id != as.telegram.group_chat_id) {
-        repo.getUser(ctx.from.id, (res, err) =>{
+        repo.getUser(ctx.message.from.id, (res, err) => {
             if (err || res == null || res.rows.length < 1) {
                 ctx.reply(`Sorry! I only work inside my group`);
                 return;
+            }
+            else if (res.rows[0].command_session != '' && !ctx.message.text.startsWith('/')) {
+                commands.forEach(cmd => {
+                    if (cmd.cmd?.name == res.rows[0].command_session) {
+                        cmd.cmd?.react(ctx, msgOps);
+                     }
+                });
             }
         });
     }
@@ -64,7 +71,9 @@ bot.on('text', async (ctx) => {
                 cmd.cmd?.execute(ctx, msgOps, commands);
                 return;
             }
-            cmd.cmd?.execute(ctx, msgOps);
+            if (cmd.cmd?.admin && (ctx.chat.id != as.telegram.group_chat_id || command == 'start')) {
+                cmd.cmd?.execute(ctx, msgOps);
+            }
         }
     });
 });
