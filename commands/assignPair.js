@@ -1,8 +1,8 @@
 import { repo } from '../services/dbrepo.js';
 
 export const cmd = {
-    name: 'addpair',
-    desc: 'Add pair to list\\.',
+    name: 'assignpair',
+    desc: 'Assign pair to schedule\\.',
     admin: true,
     execute: (ctx, msgOps) => {
         repo.getUser(ctx.message.from.id, (res, err) => {
@@ -12,10 +12,20 @@ export const cmd = {
                 return;
             }
             else {
-                repo.setUserSession(ctx.from.id, 'addpair', '', '1', (res, err) => {
+                repo.setUserSession(ctx.from.id, 'assignpair', '', '1', (res, err) => {
                     if (err) { console.log(err); return; }
 
-                    ctx.telegram.sendMessage(ctx.chat.id, `Adding new pair!\n(You can use \/cancel to cancel)\n\nEnter name:`);
+                    let message = `Assigning pair!\n(You can use \/cancel to cancel)\n\nSelect pair from the list:\n`
+                    
+                    repo.getAllPairs((res, err) => {
+                        if (err) { console.log(err); return; }
+
+                        res.rows.forEach(row => {
+                            message += `\n${row.id} - ${row.name} (${row.type})`;
+                        });
+
+                        ctx.telegram.sendMessage(ctx.chat.id, message);
+                    });
                 })
             }
         });
@@ -33,29 +43,28 @@ export const cmd = {
             let response_message = '';
             switch (sessionStage) {
                 case 1:
-                    response_message += 'Enter pair type:';
+                    response_message += 'Enter week:';
                     break;
 
                 case 2:
-                    response_message += 'Enter link to pair:\n(if no link, send \'*\')';
+                    response_message += 'Enter day:\n1 - Monday\n2 - Tuesday\n...\n6 - Saturday';
                     break;
 
                 case 3:
-                    let data = sessionData.split('%%');
-                    if (data[2] == '*') data[2] = null;
+                    response_message += 'Enter pair number:\n1 - 6';
+                    break;
 
+                case 4:
                     send = false;
 
-                    repo.addPair(data[0], data[1], data[2], (res, err) => {
+                    let data = sessionData.split('%%');
+                    repo.assignPair(data[1], data[2], data[3], data[0], (res, err) => {
                         if (err) { console.log(err); return; }
-
-                        repo.setUserSession(ctx.from.id, '', '', '', (res, err) => {
-                            if (err) { console.log(err); return; }
-
-                            ctx.telegram.sendMessage(ctx.chat.id, 'Success!');
-                            sessionData = '';
-                            sessionStage = '';
-                        })
+                        
+                        response_message += 'Success!';
+                        ctx.telegram.sendMessage(ctx.chat.id, response_message);
+                        sessionData = '';
+                        sessionStage = '';
                     });
                     break;
             }
