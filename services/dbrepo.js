@@ -63,7 +63,7 @@ class DbRepo {
     }
 
     getPair(week, day, num, callback) {
-        this.#query(`select subject.name, subject.type, subject.auditory, subject.link, subject.teacher from subject join schedule on schedule.subject_id = subject.id where schedule.week_num = ${week} and schedule.day_num = ${day} and schedule.pair_id = ${num} ;`, callback);
+        this.#query(`select subject.id, subject.name, subject.type, subject.auditory, subject.link, subject.teacher from subject join schedule on schedule.subject_id = subject.id where schedule.week_num = ${week} and schedule.day_num = ${day} and schedule.pair_id = ${num} ;`, callback);
     }
 
     getPairTimes(callback) {
@@ -74,6 +74,28 @@ class DbRepo {
         this.#query(`insert into public.subject(name, type, link) values (\'${name}\', \'${type}\', \'${link == '*' ? null : link}\') returning *;`, (res, err) => {
             this.#query(`insert into public.schedule(subject_id, week_num, day_num, pair_id) values (${res.rows[0].id}, ${week}, ${day}, ${pair});`, callback);
         });
+    }
+
+    editPair(id, name, type, link, callback) {
+        let query = `update public.subject set`;
+
+        let crutch = false;
+        if (name != null) {
+            query += ` name = \'${name}\'`;
+            crutch = true;
+        }
+        if (type != null) {
+            query += `${crutch ? ',' : ''} type = \'${type}\'`;
+            crutch = true;
+        }
+        if (link != null) {
+            query += `${crutch ? ',' : ''} link = \'${link}\'`;
+            crutch = true;
+        }
+
+        query += ` where id = \'${id}\';`;
+
+        this.#query(query, callback);
     }
     //#endregion
 
