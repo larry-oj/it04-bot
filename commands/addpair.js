@@ -1,4 +1,5 @@
 import { repo } from '../services/dbrepo.js';
+import { Schedule } from '../services/schedule.js';
 
 export const cmd = {
     name: 'addpair',
@@ -28,6 +29,8 @@ export const cmd = {
             let sessionData = res.rows[0].session_data;
             sessionData += ctx.message.text + '%%';
 
+            let send = true;
+
             let response_message = '';
             switch (sessionStage) {
                 case 1:
@@ -54,7 +57,7 @@ export const cmd = {
                     let data = sessionData.split('%%');
                     if (data[5] == '*') data[5] = null;
 
-                    response_message += 'Adding new pair...';
+                    send = false;
 
                     repo.addPair(data[0], data[1], data[2], data[3], data[4], data[5], (res, err) => {
                         if (err) { console.log(err); return; }
@@ -72,7 +75,11 @@ export const cmd = {
             repo.setUserSession(ctx.from.id, null, sessionData, sessionStage + 1, (res, err) => {
                 if (err) { console.log(err); return; }
 
-                ctx.telegram.sendMessage(ctx.chat.id, response_message);
+                if (send) {
+                    ctx.telegram.sendMessage(ctx.chat.id, response_message);
+                }
+
+                Schedule.getInstance().reload(null, msgOps);
             });
         });
     }
