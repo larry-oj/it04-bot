@@ -22,24 +22,42 @@ class DbRepo {
         this.#query(`DELETE FROM public.user WHERE id = \'${id}\';`, callback);
     }
 
-    setUserSession(id, callback, commandSession = '', sessionData = '') {
-        this.#query(`UPDATE public.user SET command_session = \'${commandSession}\', session_data = \'${sessionData}\' WHERE id = \'${id}\';`, callback)
+    setUserSession(id, commandSession, sessionData, sessionStage, callback) {
+        let query = `update public.user set`;
+
+        let crutch = false;
+        if (commandSession != null) {
+            query += ` command_session = \'${commandSession}\'`;
+            crutch = true;
+        }
+        if (sessionData != null) {
+            query += `${crutch ? ',' : ''} session_data = \'${sessionData}\'`;
+            crutch = true;
+        }
+        if (sessionStage != null) {
+            query += `${crutch ? ',' : ''} session_stage = \'${sessionStage}\'`;
+            crutch = true;
+        }
+
+        query += ` where id = \'${id}\';`;
+
+        this.#query(query, callback);
     }
     //#endregion
 
 
     //#region schedule
-    changeWeek(callback) {
+    changeWeek() {
         this.#query(`select * from public.week_num;`, (res, err) => {
             if (err) {
                 console.error(err);
                 return;
             }
             if (res.rows[0].num == 1) {
-                this.#query(`update public.week_num set num = 2 where num = 1;`, callback);
+                this.#query(`update public.week_num set num = 2 where num = 1;`, (res, err) => {});
             }
             else {
-                this.#query(`update public.week_num set num = 1 where num = 2;`, callback);
+                this.#query(`update public.week_num set num = 1 where num = 2;`, (res, err) => { });
             }
         });
     }
