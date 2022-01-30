@@ -7,7 +7,7 @@ export let jobs = [];
 export const init = (bot, msgOps) => {
     // push week change
     jobs.push(
-        ns.scheduleJob('* * * * 7', () => {
+        ns.scheduleJob('* 2 * * 7', () => {
             repo.changeWeek()
         })
     );
