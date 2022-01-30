@@ -67,13 +67,15 @@ bot.on('text', async (ctx) => {
 
     commands.forEach(cmd => {
         if (cmd.cmd?.name == command) {
-            if (command == 'help') {
+            if (cmd.cmd?.admin && (ctx.chat.id != as.telegram.group_chat_id || command == 'help')) {
                 cmd.cmd?.execute(ctx, msgOps, commands);
                 return;
             }
             if (cmd.cmd?.admin && (ctx.chat.id != as.telegram.group_chat_id || command == 'start')) {
                 cmd.cmd?.execute(ctx, msgOps);
+                return;
             }
+            cmd.cmd?.execute(ctx, msgOps);
         }
     });
 });
