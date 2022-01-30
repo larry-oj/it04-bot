@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { Telegraf } from 'telegraf';
 import { as } from './appsettings.js';
 import { repo } from './services/dbrepo.js';
-import * as schedule from './services/schedule.js';
+import { Schedule } from './services/schedule.js';
 // #endregion
 
 
@@ -33,12 +33,14 @@ fs.readdir('./commands', (err, files) => {
 
 // #region initialize instances
 const bot = new Telegraf(as.telegram.token);
-schedule.init(bot, msgOps);
+Schedule.getInstance().reload(bot, msgOps);
 // #endregion
 
 
 // react to text messages
 bot.on('text', async (ctx) => {
+    console.log(Schedule.getInstance().jobs);
+
     // outsider protection
     if (ctx.chat.id != as.telegram.group_chat_id) {
         repo.getUser(ctx.message.from.id, (res, err) => {
