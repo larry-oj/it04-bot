@@ -23,13 +23,28 @@ export const cmd = {
 
                 let best = 0;
                 let diff = 10000;
+
+                let in_proggress = false;
                 times.forEach(pair => {
-                    let tmp = Math.abs(hour_now - pair.begin_hours) * 60 + Math.abs(minute_now - pair.begin_minutes);
-                    if (tmp < diff) {
-                        diff = tmp;
-                        best = pair.id;
+                    if (pair.begin_hours <= hour_now && hour_now <= pair.end_hours) {
+                        if ((hour_now == pair.begin_hours && minute_now >= pair.begin_minutes) ||
+                            (hour_now == pair.end_hours && minute_now <= pair.end_minutes) || 
+                            (pair.begin_hours < hour_now && hour_now < pair.end_hours)) {
+                            best = pair.id;
+                            in_proggress = true;
+                        }
                     }
                 });
+
+                if (best == 0) {
+                    times.forEach(pair => {
+                        let tmp = Math.abs(hour_now - pair.begin_hours) * 60 + Math.abs(minute_now - pair.begin_minutes);
+                        if (tmp < diff) {
+                            diff = tmp;
+                            best = pair.id;
+                        }
+                    });
+                }
 
                 repo.getPair(week_now, day_now, best, (res, err) => {
                     if (err) { console.error(err); return; }
@@ -45,6 +60,12 @@ export const cmd = {
                                 message += ` - ${row.link}`;
                             }
                         });
+
+                        let left = 0;
+                        if (in_proggress) {
+                            left = Math.abs(hour_now - times[best - 1].end_hours) * 60 - Math.abs(minute_now - times[best - 1].end_minutes);
+                        }
+                        message += `\n\nДо конца пары: ${left} минут`;
                     }
 
                     ctx.telegram.sendMessage(ctx.chat.id, message);
