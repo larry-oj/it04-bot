@@ -39,8 +39,6 @@ Schedule.getInstance().reload(bot, msgOps);
 
 // react to text messages
 bot.on('text', async (ctx) => {
-    console.log(Schedule.getInstance().jobs);
-
     // outsider protection
     if (ctx.chat.id != as.telegram.group_chat_id) {
         repo.getUser(ctx.message.from.id, (res, err) => {
