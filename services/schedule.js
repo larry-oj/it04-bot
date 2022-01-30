@@ -46,7 +46,10 @@ export const init = (bot, msgOps) => {
                             // generate message
                             msg_str = `Пара #${pair}\n`;
                             res.rows.forEach(row => {
-                                msg_str += `\n${row.name} (${row.type}) - ${row.link}`;
+                                msg_str += `\n${row.name} (${row.type})`;
+                                if (row.link != null && row.link != 'null') {
+                                    msg_str += ` - ${row.link}`;
+                                }
                             });
 
                             // funny js momemnt:
