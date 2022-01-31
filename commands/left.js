@@ -46,6 +46,9 @@ export const cmd = {
                 let left = Math.abs(hour_now - times[best - 1].end_hours) * 60 - Math.abs(minute_now - times[best - 1].end_minutes);
                 message += `\n\nДо конца пары: ${left} минут(-ы)`;
             }
+            else {
+                message += `\n\nСейчас перемена`;
+            }
             
             ctx.telegram.sendMessage(ctx.chat.id, message);
         });
