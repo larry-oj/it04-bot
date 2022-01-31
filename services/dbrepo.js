@@ -115,6 +115,14 @@ class DbRepo {
 
         this.#query(query, callback);
     }
+
+    deletePair(id, callback) {
+        this.#query(`delete from public.schedule where subject_id = ${id} ;`, (res, err) => {
+            if (err) { console.error(err); return; }
+
+            this.#query(`delete from public.subject where id = ${id} ;`, callback);
+        });
+    }
     //#endregion
 
 
