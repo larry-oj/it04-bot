@@ -67,7 +67,7 @@ bot.on('text', async (ctx) => {
 
     commands.forEach(cmd => {
         if (cmd.cmd?.name == command) {
-            if (cmd.cmd?.admin && (ctx.chat.id != as.telegram.group_chat_id || command == 'help')) {
+            if (command == 'help') {
                 cmd.cmd?.execute(ctx, msgOps, commands);
                 return;
             }
