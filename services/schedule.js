@@ -9,7 +9,11 @@ export class Schedule {
     }
 
     reload(bot = null, msgOps) {
+        for (const job in ns.scheduledJobs) {
+            ns.cancelJob(job);
+        } 
         this.j = [];
+
         if (bot != null) {
             this.bot = bot;
         }
