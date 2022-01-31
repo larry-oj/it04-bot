@@ -90,6 +90,10 @@ class DbRepo {
         this.#query(`insert into public.schedule(subject_id, week_num, day_num, pair_id) values (${id}, ${week}, ${day}, ${pair});`, callback);
     } 
 
+    removePair(week, day, pair, id, callback) {
+        this.#query(`delete from public.schedule where subject_id = ${id} and week_num = ${week} and day_num = ${day} and pair_id = ${pair};`, callback);
+    }
+
     editPair(id, name, type, link, callback) {
         let query = `update public.subject set`;
 
