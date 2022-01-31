@@ -49,7 +49,7 @@ export const cmd = {
                 repo.getPair(week_now, day_now, best, (res, err) => {
                     if (err) { console.error(err); return; }
 
-                    let message = `Пара #${best}\n(${times[best - 1].begin_hours}:${times[best - 1].begin_minutes} - ${times[best - 1].end_hours}:${times[best - 1].end_minutes})`;
+                    let message = `Пара #${best}\n(${times[best - 1].begin_hours}:${('0' + times[best - 1].begin_minutes).slice(-2)} - ${times[best - 1].end_hours}:${('0' + times[best - 1].end_minutes).slice(-2)})`;
                     if (res == null || res.rows == null || res.rows.length < 1) {
                         message += `\nОкно (пустая пара)`;
                     }
