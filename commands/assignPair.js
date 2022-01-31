@@ -62,10 +62,14 @@ export const cmd = {
                     repo.assignPair(data[1], data[2], data[3], data[0], (res, err) => {
                         if (err) { console.log(err); return; }
                         
-                        response_message += 'Success!';
-                        ctx.telegram.sendMessage(ctx.chat.id, response_message);
-                        sessionData = '';
-                        sessionStage = '';
+                        repo.setUserSession(ctx.from.id, '', '', '', (res, err) => {
+                            if (err) { console.log(err); return; }
+
+                            ctx.telegram.sendMessage(ctx.chat.id, 'Success!');
+                            sessionData = '';
+                            sessionStage = '';
+                        });
+                        
                         Schedule.getInstance().reload(null, msgOps);
                     });
                     break;
