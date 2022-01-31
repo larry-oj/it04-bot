@@ -69,6 +69,10 @@ class DbRepo {
     getPair(week, day, num, callback) {
         this.#query(`select subject.id, subject.name, subject.type, subject.auditory, subject.link, subject.teacher from subject join schedule on schedule.subject_id = subject.id where schedule.week_num = ${week} and schedule.day_num = ${day} and schedule.pair_id = ${num} ;`, callback);
     }
+    
+    getDay(week, day, callback) {
+        this.#query(`select schedule.pair_id, subject.name, subject.type, subject.link from schedule join subject on schedule.subject_id = subject.id where schedule.week_num = ${week} and schedule.day_num = ${day} order by schedule.pair_id;`, callback);
+    }
 
     getAllPairs(callback) {
         this.#query(`select * from public.subject;`, callback);
