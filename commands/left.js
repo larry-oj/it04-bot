@@ -50,7 +50,7 @@ export const cmd = {
                 message += `\nДо конца пары: <b>${left} мин.</b>`;
             }
             else {
-                message += `\n<b>Сейчас перемена<b>`;
+                message += `\n<b>Сейчас перемена</b>`;
             }
             
             ctx.telegram.sendMessage(ctx.chat.id, message, msgOps);
