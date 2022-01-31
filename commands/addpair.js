@@ -2,7 +2,7 @@ import { repo } from '../services/dbrepo.js';
 
 export const cmd = {
     name: 'add',
-    desc: 'Add pair to list\\.',
+    desc: 'Add pair to list.',
     admin: true,
     execute: (ctx, msgOps) => {
         repo.getUser(ctx.message.from.id, (res, err) => {

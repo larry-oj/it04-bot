@@ -3,7 +3,7 @@ import { Schedule } from '../services/schedule.js';
 
 export const cmd = {
     name: 'edit',
-    desc: 'Edit pair in schedule\\.',
+    desc: 'Edit pair in schedule.',
     admin: true,
     execute: (ctx, msgOps) => {
         repo.getUser(ctx.message.from.id, (res, err) => {

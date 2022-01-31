@@ -3,7 +3,7 @@ import { Schedule } from '../services/schedule.js';
 
 export const cmd = {
     name: 'assign',
-    desc: 'Assign pair to schedule\\.',
+    desc: 'Assign pair to schedule.',
     admin: true,
     execute: (ctx, msgOps) => {
         repo.getUser(ctx.message.from.id, (res, err) => {

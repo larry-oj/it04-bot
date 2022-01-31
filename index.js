@@ -9,7 +9,7 @@ import { Schedule } from './services/schedule.js';
 
 // #region standart message options
 const msgOps = {
-    parse_mode: 'MarkdownV2'
+    parse_mode: 'HTML'
 };
 // #endregion
 

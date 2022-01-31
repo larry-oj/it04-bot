@@ -2,7 +2,7 @@ import { repo } from '../services/dbrepo.js';
 
 export const cmd = {
     name: 'cancel',
-    desc: 'Cancells current command session\\.',
+    desc: 'Cancells current command session.',
     admin: true,
     execute: (ctx, msgOps) => {
         repo.getUser(ctx.message.from.id, (res, err) => {

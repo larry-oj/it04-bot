@@ -2,7 +2,7 @@ import { repo } from '../services/dbrepo.js';
 
 export const cmd = {
     name: 'now',
-    desc: 'Show current \\/ closest pair\\.',
+    desc: 'Show current / closest pair.',
     admin: false,
     execute: (ctx, msgOps) => {
         repo.getPairTimes((res, err) => {
@@ -49,20 +49,20 @@ export const cmd = {
                 repo.getPair(week_now, day_now, best, (res, err) => {
                     if (err) { console.error(err); return; }
 
-                    let message = `Пара #${best}\n(${times[best - 1].begin_hours}:${('0' + times[best - 1].begin_minutes).slice(-2)} - ${times[best - 1].end_hours}:${('0' + times[best - 1].end_minutes).slice(-2)})`;
+                    let message = `<b>Пара #${best}</b>\n<code>(${times[best - 1].begin_hours}:${('0' + times[best - 1].begin_minutes).slice(-2)} - ${times[best - 1].end_hours}:${('0' + times[best - 1].end_minutes).slice(-2)})</code>`;
                     if (res == null || res.rows == null || res.rows.length < 1) {
-                        message += `\nОкно (пустая пара)`;
+                        message += `\nОкно <i>(пустая пара)</i>`;
                     }
                     else {
                         res.rows.forEach(row => {
                             message += `\n${row.name} (${row.type})`;
                             if (row.link != null && row.link != 'null') {
-                                message += ` - ${row.link}`;
+                                message += ` - <a href=\"${row.link}\">ссылка</a>`;
                             }
                         });
                     }
 
-                    ctx.telegram.sendMessage(ctx.chat.id, message);
+                    ctx.telegram.sendMessage(ctx.chat.id, message, msgOps);
                 })
             });
         });
