@@ -75,7 +75,7 @@ class DbRepo {
     }
 
     getAllPairs(callback) {
-        this.#query(`select * from public.subject;`, callback);
+        this.#query(`select * from public.subject order by id;`, callback);
     }
 
     getPairTimes(callback) {
