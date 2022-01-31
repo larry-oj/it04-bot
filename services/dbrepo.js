@@ -11,7 +11,7 @@ class DbRepo {
 
     //#region userdata
     addUser(id, callback) {
-        this.#query(`INSERT INTO public.user(id) VALUES (\'${id}\');`, callback);
+        this.#query(`INSERT INTO public.user(id) VALUES (\'${id}\') returning *;`, callback);
     }
 
     getUser(id, callback) {
