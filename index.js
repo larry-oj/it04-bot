@@ -83,4 +83,5 @@ bot.on('text', async (ctx) => {
 
 // launch bot
 bot.launch();
+bot.telegram.sendMessage(as.telegram.creator_id, 'Bot has reloaded!');
 console.log('Bot has successfully launched!');
