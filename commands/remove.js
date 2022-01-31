@@ -71,6 +71,8 @@ export const cmd = {
                             sessionData = '';
                             sessionStage = '';
                         });
+
+                        Schedule.getInstance().reload(null, msgOps);
                     });
                     break;
             }
@@ -80,8 +82,6 @@ export const cmd = {
                 if (send) {
                     ctx.telegram.sendMessage(ctx.chat.id, response_message);
                 }
-
-                Schedule.getInstance().reload(null, msgOps);
             });
         });
     }
