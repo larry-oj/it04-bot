@@ -39,19 +39,35 @@ Schedule.getInstance().reload(bot, msgOps);
 
 // react to text messages
 bot.on('text', async (ctx) => {
-    // outsider protection
+    // make sure user is in db
+    repo.getUser(ctx.message.from.id, (res, err) => {
+        // add user if not
+        if (res == null || res.rows.length < 1) {   
+            repo.addUser(ctx.from.id, (res, err) => {
+                if (err) { console.error(err); return; }
+                response(ctx, res.rows[0]);
+            });
+        }
+        else {
+            response(ctx, res.rows[0]);
+        }
+    });
+});
+
+async function response(ctx, user) {
+    // if message is not from the group
     if (ctx.chat.id != as.telegram.group_chat_id) {
-        repo.getUser(ctx.message.from.id, (res, err) => {
-            if (err || res == null || res.rows.length < 1) {
-                ctx.reply(`Sorry! I only work inside my group`);
-                return;
-            }
-            else if (res.rows[0].command_session != '' && !ctx.message.text.startsWith('/')) {
-                commands.forEach(cmd => {
-                    if (cmd.cmd?.name == res.rows[0].command_session) {
-                        cmd.cmd?.react(ctx, msgOps);
-                     }
-                });
+        if (user.is_admin == 'false') {
+            ctx.telegram.sendMessage(ctx.chat.id, 'Sorry! I only work inside my group');
+            return;
+        }
+    }
+    
+    // check for an active session
+    if (user.command_session != '' && !ctx.message.text.startsWith('/cancel')) {
+        commands.forEach(cmd => {
+            if (cmd.cmd?.name == user.command_session) {
+                cmd.cmd?.react(ctx, msgOps);
             }
         });
     }
@@ -59,26 +75,27 @@ bot.on('text', async (ctx) => {
     // if not a command
     if (!ctx.message.text.startsWith('/')) return;
 
-    // split into arguments
-    let args = ctx.message.text.split(/\s+/);
-
     // get command name
-    let command = args[0].toLowerCase().replace('/', '').replace(as.telegram.bot_tag, '');
+    let command = ctx.message.text
+        .split(/\s+/)[0]
+        .toLowerCase()
+        .replace('/', '')
+        .replace(as.telegram.bot_tag, '');
 
+    // find command
     commands.forEach(cmd => {
         if (cmd.cmd?.name == command) {
             if (command == 'help') {
                 cmd.cmd?.execute(ctx, msgOps, commands);
                 return;
             }
-            if (cmd.cmd?.admin && (ctx.chat.id != as.telegram.group_chat_id || command == 'start')) {
-                cmd.cmd?.execute(ctx, msgOps);
-                return;
-            }
+
+            if (cmd.cmd?.admin && user.is_admin == 'false') return;
+
             cmd.cmd?.execute(ctx, msgOps);
         }
     });
-});
+}
 
 
 // launch bot
