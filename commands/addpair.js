@@ -12,7 +12,7 @@ export const cmd = {
                 return;
             }
             else {
-                repo.setUserSession(ctx.from.id, 'addpair', '', '1', (res, err) => {
+                repo.setUserSession(ctx.from.id, 'add', '', '1', (res, err) => {
                     if (err) { console.log(err); return; }
 
                     ctx.telegram.sendMessage(ctx.chat.id, `Adding new pair!\n(You can use \/cancel to cancel)\n\nEnter name:`);

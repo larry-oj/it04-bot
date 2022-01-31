@@ -13,7 +13,7 @@ export const cmd = {
                 return;
             }
             else {
-                repo.setUserSession(ctx.from.id, 'editpair', '', '1', (res, err) => {
+                repo.setUserSession(ctx.from.id, 'edit', '', '1', (res, err) => {
                     if (err) { console.log(err); return; }
 
                     ctx.telegram.sendMessage(ctx.chat.id, `Editing pair!\n(You can use \/cancel to cancel)\n\nEnter week:`);
@@ -126,7 +126,7 @@ export const cmd = {
                 if (send) {
                     ctx.telegram.sendMessage(ctx.chat.id, response_message);
                 }
-
+                
                 Schedule.getInstance().reload(null, msgOps);
             });
         });

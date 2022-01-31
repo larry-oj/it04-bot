@@ -1,4 +1,5 @@
 import { repo } from '../services/dbrepo.js';
+import { Schedule } from '../services/schedule.js';
 
 export const cmd = {
     name: 'assign',
@@ -12,7 +13,7 @@ export const cmd = {
                 return;
             }
             else {
-                repo.setUserSession(ctx.from.id, 'assignpair', '', '1', (res, err) => {
+                repo.setUserSession(ctx.from.id, 'assign', '', '1', (res, err) => {
                     if (err) { console.log(err); return; }
 
                     let message = `Assigning pair!\n(You can use \/cancel to cancel)\n\nSelect pair from the list:\n`
@@ -65,6 +66,7 @@ export const cmd = {
                         ctx.telegram.sendMessage(ctx.chat.id, response_message);
                         sessionData = '';
                         sessionStage = '';
+                        Schedule.getInstance().reload(null, msgOps);
                     });
                     break;
             }
