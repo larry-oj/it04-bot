@@ -5,100 +5,71 @@ export const cmd = {
     name: 'edit',
     desc: 'Edit pair in schedule.',
     admin: true,
-    execute: (ctx, msgOps) => {
-        repo.getUser(ctx.message.from.id, (res, err) => {
-            if (err) { console.log(err); return; }
+    execute: async (ctx, msgOps, user) => {
+        await repo.setUserSession(ctx.from.id, 'edit', '', '1');
 
-            if (res.rows[0].is_admin == false) {
-                return;
-            }
-            else {
-                repo.setUserSession(ctx.from.id, 'edit', '', '1', (res, err) => {
-                    if (err) { console.log(err); return; }
-
-                    let message = `Editing pair!\n(You can use \/cancel to cancel)\n\nSelect pair from the list:\n`
-                    
-                    repo.getAllPairs((res, err) => {
-                        if (err) { console.log(err); return; }
-
-                        res.rows.forEach(row => {
-                            message += `\n${row.id} - ${row.name} (${row.type})`;
-                        });
-
-                        ctx.telegram.sendMessage(ctx.chat.id, message);
-                    });
-                });
-            }
+        let pairs = await repo.getAllPairs();
+            
+        let message = `Editing pair!\n(You can use \/cancel to cancel)\n\nSelect pair from the list:\n`
+        pairs.forEach(p => {
+            message += `\n${p.id} - ${p.name} (${p.type})`;
         });
+
+        ctx.telegram.sendMessage(ctx.chat.id, message);
     },
-    react: (ctx, msgOps) => {
-        repo.getUser(ctx.from.id, (res, err) => {
-            if (err) { console.log(err); return; }
+    react: async (ctx, msgOps, user) => {
+        let commandSession = null;
+        let sessionStage = +user.session_stage;
+        let sessionData = user.session_data;
+        sessionData += ctx.message.text + '%%';
 
-            let sessionStage = +res.rows[0].session_stage;
-            let sessionData = res.rows[0].session_data;
-            sessionData += ctx.message.text + '%%';
+        let response_message = '';
+        switch (sessionStage) {
+            case 1:
+                response_message += 'Enter data, that will replace something (you will choose what later) (send \'*\' if you want to delete link):';
+                sessionStage++;
+                break;
 
-            let send = true;
+            case 2:
+                response_message += 'What to do?\n1 - edit name\n2 - edit type\n3 - edit link';
+                sessionStage++;
+                break;
 
-            let response_message = '';
-            switch (sessionStage) {
-                case 1:
-                    response_message += 'Enter data, that will replace something (you will choose what later) (send \'*\' if you want to delete link):';
-                    break;
+            case 3:
+                let data = sessionData.split('%%');
 
-                case 2:
-                    response_message += 'What to do?\n1 - edit name\n2 - edit type\n3 - edit link';
-                    break;
+                let name = null;
+                let type = null;
+                let link = 'null';
 
-                case 3:
-                    let data1 = sessionData.split('%%');
+                switch (+data[2]) {
+                    case 1:
+                        name = data[1];
+                        break;
 
-                    send = false;
+                    case 2:
+                        type = data[1];
+                        break;
 
-                    let name = null;
-                    let type = null;
-                    let link = 'null';
-
-                    switch (+data1[2]) {
-                        case 1:
-                            name = data1[1];
-                            break;
-
-                        case 2:
-                            type = data1[1];
-                            break;
-
-                        case 3:
-                            link = data1[1] == '*' ? 'null' : data1[1];
-                            break;
-                    }
-
-                    repo.editPair(data1[0], name, type, link, (res, err) => {
-                        if (err) { console.log(err); return; }
-
-                        repo.setUserSession(ctx.from.id, '', '', '', (res, err) => {
-                            if (err) { console.log(err); return; }
-
-                            ctx.telegram.sendMessage(ctx.chat.id, 'Success!');
-                            sessionData = '';
-                            sessionStage = '';
-                        });
-
-                        Schedule.getInstance().reload(null, msgOps);
-                    });
-
-                    break;
-                    
-            }
-            repo.setUserSession(ctx.from.id, null, sessionData, sessionStage + 1, (res, err) => {
-                if (err) { console.log(err); return; }
-
-                if (send) {
-                    ctx.telegram.sendMessage(ctx.chat.id, response_message);
+                    case 3:
+                        link = data[1] == '*' ? 'null' : data[1];
+                        break;
                 }
+
+                await repo.editPair(data[0], name, type, link);
+                    
+                response_message += 'Success!';
+                commandSession = '';
+                sessionData = '';
+                sessionStage = '';
+
+                Schedule.getInstance().reload(null, msgOps);
+
+                break;
                 
-            });
-        });
+        }
+        await repo.setUserSession(ctx.from.id, commandSession, sessionData, sessionStage);
+        
+        ctx.telegram.sendMessage(ctx.chat.id, response_message);
     }
 }

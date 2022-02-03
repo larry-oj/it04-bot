@@ -5,82 +5,56 @@ export const cmd = {
     name: 'assign',
     desc: 'Assign pair to schedule.',
     admin: true,
-    execute: (ctx, msgOps) => {
-        repo.getUser(ctx.message.from.id, (res, err) => {
-            if (err) { console.log(err); return; }
-
-            if (res.rows[0].is_admin == false) {
-                return;
-            }
-            else {
-                repo.setUserSession(ctx.from.id, 'assign', '', '1', (res, err) => {
-                    if (err) { console.log(err); return; }
-
-                    let message = `Assigning pair!\n(You can use \/cancel to cancel)\n\nSelect pair from the list:\n`
-                    
-                    repo.getAllPairs((res, err) => {
-                        if (err) { console.log(err); return; }
-
-                        res.rows.forEach(row => {
-                            message += `\n${row.id} - ${row.name} (${row.type})`;
-                        });
-
-                        ctx.telegram.sendMessage(ctx.chat.id, message);
-                    });
-                })
-            }
+    execute: async (ctx, msgOps, user) => {
+        await repo.setUserSession(ctx.from.id, 'assign', '', '1');
+            
+        let pairs = await repo.getAllPairs();
+            
+        let message = `Assigning pair!\n(You can use \/cancel to cancel)\n\nSelect pair from the list:\n`
+        pairs.forEach(p => {
+            message += `\n${p.id} - ${p.name} (${p.type})`;
         });
+
+        ctx.telegram.sendMessage(ctx.chat.id, message);
     },
-    react: (ctx, msgOps) => {
-        repo.getUser(ctx.from.id, (res, err) => {
-            if (err) { console.log(err); return; }
+    react: async (ctx, msgOps, user) => {            
+        let commandSession = null;
+        let sessionStage = +user.session_stage;
+        let sessionData = user.session_data;
+        sessionData += ctx.message.text + '%%';
 
-            let sessionStage = +res.rows[0].session_stage;
-            let sessionData = res.rows[0].session_data;
-            sessionData += ctx.message.text + '%%';
+        let response_message = '';
+        switch (sessionStage) {
+            case 1:
+                response_message += 'Enter week:';
+                sessionStage++;
+                break;
 
-            let send = true;
+            case 2:
+                response_message += 'Enter day:\n1 - Monday\n2 - Tuesday\n...\n6 - Saturday';
+                sessionStage++;
+                break;
 
-            let response_message = '';
-            switch (sessionStage) {
-                case 1:
-                    response_message += 'Enter week:';
-                    break;
+            case 3:
+                response_message += 'Enter pair number:\n1 - 6';
+                sessionStage++;
+                break;
 
-                case 2:
-                    response_message += 'Enter day:\n1 - Monday\n2 - Tuesday\n...\n6 - Saturday';
-                    break;
+            case 4:
+                let data = sessionData.split('%%');
+                
+                await repo.assignPair(data[1], data[2], data[3], data[0]);
+                await repo.setUserSession(ctx.from.id, '', '', '');
 
-                case 3:
-                    response_message += 'Enter pair number:\n1 - 6';
-                    break;
-
-                case 4:
-                    send = false;
-
-                    let data = sessionData.split('%%');
-                    repo.assignPair(data[1], data[2], data[3], data[0], (res, err) => {
-                        if (err) { console.log(err); return; }
-                        
-                        repo.setUserSession(ctx.from.id, '', '', '', (res, err) => {
-                            if (err) { console.log(err); return; }
-
-                            ctx.telegram.sendMessage(ctx.chat.id, 'Success!');
-                            sessionData = '';
-                            sessionStage = '';
-                        });
-                        
-                        Schedule.getInstance().reload(null, msgOps);
-                    });
-                    break;
-            }
-            repo.setUserSession(ctx.from.id, null, sessionData, sessionStage + 1, (res, err) => {
-                if (err) { console.log(err); return; }
-
-                if (send) {
-                    ctx.telegram.sendMessage(ctx.chat.id, response_message);
-                }
-            });
-        });
+                response_message += 'Success!';
+                commandSession = '';
+                sessionData = '';
+                sessionStage = '';
+                
+                Schedule.getInstance().reload(null, msgOps);
+                break;
+        }
+        await repo.setUserSession(ctx.from.id, commandSession, sessionData, sessionStage);
+        ctx.telegram.sendMessage(ctx.chat.id, response_message);
     }
 }

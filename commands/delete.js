@@ -5,49 +5,26 @@ export const cmd = {
     name: 'delete',
     desc: 'Assign pair to schedule.',
     admin: true,
-    execute: (ctx, msgOps) => {
-        repo.getUser(ctx.message.from.id, (res, err) => {
-            if (err) { console.log(err); return; }
+    execute: async (ctx, msgOps, user) => {
+        await repo.setUserSession(ctx.from.id, 'delete', '', '1');
 
-            if (res.rows[0].is_admin == false) {
-                return;
-            }
-            else {
-                repo.setUserSession(ctx.from.id, 'delete', '', '1', (res, err) => {
-                    if (err) { console.log(err); return; }
+        let pairs = await repo.getAllPairs();
 
-                    let message = `Deleting pair!\n(You can use \/cancel to cancel)\n\nSelect pair from the list:\n`
-
-                    repo.getAllPairs((res, err) => {
-                        if (err) { console.log(err); return; }
-
-                        res.rows.forEach(row => {
-                            message += `\n${row.id} - ${row.name} (${row.type})`;
-                        });
-
-                        ctx.telegram.sendMessage(ctx.chat.id, message);
-                    });
-                });
-            }
+        let message = `Deleting pair!\n(You can use \/cancel to cancel)\n\nSelect pair from the list:\n`;
+        pairs.forEach(p => {
+            message += `\n${p.id} - ${p.name} (${p.type})`;
         });
+
+        ctx.telegram.sendMessage(ctx.chat.id, message);
     },
-    react: (ctx, msgOps) => {
-        repo.getUser(ctx.message.from.id, (res, err) => {
-            if (err) { console.log(err); return; }
+    react: async (ctx, msgOps, user) => {
+        let sessionData = ctx.message.text;
 
-            let sessionData = ctx.message.text;
+        await repo.deletePair(sessionData);
+        await repo.setUserSession(ctx.from.id, '', '', '');
+            
+        ctx.telegram.sendMessage(ctx.chat.id, 'Success!');
 
-            repo.deletePair(sessionData, (res, err) => {
-                if (err) { console.log(err); return; }
-
-                repo.setUserSession(ctx.from.id, '', '', '', (res, err) => {
-                    if (err) { console.log(err); return; }
-
-                    ctx.telegram.sendMessage(ctx.chat.id, 'Success!');
-                });
-
-                Schedule.getInstance().reload(null, msgOps);
-            });
-        });
+        Schedule.getInstance().reload(null, msgOps);
     }
 }

@@ -4,67 +4,56 @@ export const cmd = {
     name: 'now',
     desc: 'Show current / closest pair.',
     admin: false,
-    execute: (ctx, msgOps) => {
-        repo.getPairTimes((res, err) => {
-            if (err) { console.error(err); return; }
+    execute: async (ctx, msgOps, user) => {
+        let times = await repo.getPairTimes();
 
-            let times = res.rows;
+        let week_now = await repo.getWeek();
 
-            let d = new Date();
+        let date_now = new Date();
+        let day_now = date_now.getDay();
+        let time_now = new Date(`1970-01-01T${('0' + date_now.getHours()).slice(-2)}:${('0' + date_now.getMinutes()).slice(-2)}:00`); 
 
-            let hour_now = d.getHours();
-            let minute_now = d.getMinutes();
-            let day_now = d.getDay();
+        let best, in_proggress;
+        [best, in_proggress] = cmd.helper(times, time_now);
 
-            repo.getWeek((res, err) => {
-                if (err) { console.error(err); return; }
+        let pairs = await repo.getPair(week_now, day_now, best);
 
-                let week_now = +res.rows[0].num;
-
-                let best = 0;
-                let diff = 10000;
-
-                let in_proggress = false;
-                times.forEach(pair => {
-                    if (pair.begin_hours <= hour_now && hour_now <= pair.end_hours) {
-                        if ((hour_now == pair.begin_hours && minute_now >= pair.begin_minutes) ||
-                            (hour_now == pair.end_hours && minute_now <= pair.end_minutes) || 
-                            (pair.begin_hours < hour_now && hour_now < pair.end_hours)) {
-                            best = pair.id;
-                            in_proggress = true;
-                        }
-                    }
-                });
-
-                if (best == 0) {
-                    times.forEach(pair => {
-                        let tmp = Math.abs(hour_now - pair.begin_hours) * 60 + Math.abs(minute_now - pair.begin_minutes);
-                        if (tmp < diff) {
-                            diff = tmp;
-                            best = pair.id;
-                        }
-                    });
+        let message = `<b>Пара #${best}</b>\n<code>(${times[best - 1].begin.getHours()}:${('0' + times[best - 1].begin.getMinutes()).slice(-2)} - ${times[best - 1].end.getHours()}:${('0' + times[best - 1].end.getMinutes()).slice(-2)})</code>`;
+        if (pairs.length < 1) {
+            message += `\nОкно <i>(пустая пара)</i>`;
+        }
+        else {
+            pairs.forEach(p => {
+                message += `\n${p.name} (${p.type})`;
+                if (p.link != null && p.link != 'null') {
+                    message += ` - <a href=\"${p.link}\">ссылка</a>`;
                 }
-
-                repo.getPair(week_now, day_now, best, (res, err) => {
-                    if (err) { console.error(err); return; }
-
-                    let message = `<b>Пара #${best}</b>\n<code>(${times[best - 1].begin_hours}:${('0' + times[best - 1].begin_minutes).slice(-2)} - ${times[best - 1].end_hours}:${('0' + times[best - 1].end_minutes).slice(-2)})</code>`;
-                    if (res == null || res.rows == null || res.rows.length < 1) {
-                        message += `\nОкно <i>(пустая пара)</i>`;
-                    }
-                    else {
-                        res.rows.forEach(row => {
-                            message += `\n${row.name} (${row.type})`;
-                            if (row.link != null && row.link != 'null') {
-                                message += ` - <a href=\"${row.link}\">ссылка</a>`;
-                            }
-                        });
-                    }
-
-                    ctx.telegram.sendMessage(ctx.chat.id, message, msgOps);
-                })
             });
+        }
+
+        ctx.telegram.sendMessage(ctx.chat.id, message, msgOps);
+    },
+    helper: (times, time_now) => {
+        let best = 0;
+        let in_progress = false;
+        times.forEach(pair => {
+            if (pair.begin.getTime() <= time_now.getTime() && time_now.getTime() <= pair.end.getTime()) {
+                best = pair.id;
+                in_progress = true;
+            }
         });
+
+        let diff = Number.MAX_SAFE_INTEGER;
+        if (best == 0) {
+            times.forEach(pair => {
+                let tmp = Math.abs(time_now.getTime() - pair.begin.getTime());
+                if (tmp < diff) {
+                    diff = tmp;
+                    best = pair.id;
+                }
+            });
+        }
+
+        return [best, in_progress];
     }
 }
