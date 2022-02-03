@@ -16,14 +16,7 @@ export const cmd = {
 
         let week_now = await repo.getWeek();
 
-        let day = await repo.getDay(week_now, day_now);
-
-        let pair_groups = [[], [], [], [], [], []];
-        day.forEach(p => {
-            pair_groups[p.pair_id - 1].push(p);
-        });
-
-        let message = await cmd2.helper(pair_groups);
+        let message = await cmd2.helper(week_now, day_now);
         
         ctx.telegram.sendMessage(ctx.chat.id, message, msgOps);
     }

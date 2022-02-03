@@ -10,6 +10,11 @@ export const cmd = {
         
         let week_now = await repo.getWeek();
 
+        let message = await cmd.helper(week_now, day_now);
+        
+        ctx.telegram.sendMessage(ctx.chat.id, message, msgOps);
+    },
+    helper: async (week_now, day_now) => {
         let day = await repo.getDay(week_now, day_now);
 
         let pair_groups = [[], [], [], [], [], []];
@@ -17,11 +22,6 @@ export const cmd = {
             pair_groups[p.pair_id - 1].push(p);
         });
 
-        let message = await cmd.helper(pair_groups);
-        
-        ctx.telegram.sendMessage(ctx.chat.id, message, msgOps);
-    },
-    helper: async (pair_groups) => {
         let times = await repo.getPairTimes();
 
         let message = '';
@@ -34,7 +34,7 @@ export const cmd = {
             });
         });
 
-        if (message == '') message = 'Пар нету!';
+        if (message == '') message = '\nПар нету!\n';
 
         return message;
     }
