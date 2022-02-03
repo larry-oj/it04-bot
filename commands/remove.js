@@ -46,7 +46,7 @@ export const cmd = {
                 data = sessionData.split('%%');
                 await repo.removePair(data[0], data[1], data[2], data[3]);
 
-                ctx.telegram.sendMessage(ctx.chat.id, 'Success!');
+                response_message += 'Success!';
                 
                 commandSession = '';
                 sessionData = '';
