@@ -21,7 +21,7 @@ export const cmd = {
             best++;           
         }
 
-        if (best == 6) {
+        if (best == 7) {
             best = 1;
             day_now++;
         } 
