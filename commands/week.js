@@ -13,27 +13,27 @@ export const cmd = {
             let tmp = '';
             switch (day) {
                 case 1:
-                    tmp = '<b><u>Понедельник</u>:</b>';
+                    tmp = '<b><u>Понеділок</u>:</b>';
                     break;
 
                 case 2:
-                    tmp = '<b><u>Вторник</u>:</b>';
+                    tmp = '<b><u>Вівторок</u>:</b>';
                     break;
 
                 case 3:
-                    tmp = '<b><u>Среда</u>:</b>';
+                    tmp = '<b><u>Середа</u>:</b>';
                     break;
 
                 case 4:
-                    tmp = '<b><u>Четверг</u>:</b>';
+                    tmp = '<b><u>Четвер</u>:</b>';
                     break;
 
                 case 5:
-                    tmp = '<b><u>Пятница</u>:</b>';
+                    tmp = '<b><u>П\'ятниця</u>:</b>';
                     break;
 
                 case 6:
-                    tmp = '<b><u>Суббота</u>:</b>';
+                    tmp = '<b><u>Субота</u>:</b>';
                     break;
             }
 

@@ -34,7 +34,7 @@ export const cmd = {
             });
         });
 
-        if (message == '') message = '\nПар нету!\n';
+        if (message == '') message = '\nПар немає!\n';
 
         return message;
     }

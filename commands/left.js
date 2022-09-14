@@ -19,12 +19,12 @@ export const cmd = {
 
         let message = `<b>Пара #${best}</b>\n<code>(${times[best - 1].begin.getHours()}:${('0' + times[best - 1].begin.getMinutes()).slice(-2)} - ${times[best - 1].end.getHours()}:${('0' + times[best - 1].end.getMinutes()).slice(-2)})</code>`;
         if (!in_proggress) {
-            message += '\nСейчас перемена';
+            message += '\nЗараз перерва';
         }
         else {
             let diff = times[best - 1].end.getTime() - time_now.getTime();
             let left = Math.floor((diff / 1000) / 60);
-            message += `\nДо конца пары: <b>${left} мин.</b>`;
+            message += `\nДо кінця пари: <b>${left} хв.</b>`;
         }
 
         ctx.telegram.sendMessage(ctx.chat.id, message, msgOps);

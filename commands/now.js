@@ -20,13 +20,13 @@ export const cmd = {
 
         let message = `<b>Пара #${best}</b>\n<code>(${times[best - 1].begin.getHours()}:${('0' + times[best - 1].begin.getMinutes()).slice(-2)} - ${times[best - 1].end.getHours()}:${('0' + times[best - 1].end.getMinutes()).slice(-2)})</code>`;
         if (pairs.length < 1) {
-            message += `\nОкно <i>(пустая пара)</i>`;
+            message += `\nВікно <i>(пуста пара)</i>`;
         }
         else {
             pairs.forEach(p => {
                 message += `\n${p.name} (${p.type})`;
                 if (p.link != null && p.link != 'null') {
-                    message += ` - <a href=\"${p.link}\">ссылка</a>`;
+                    message += ` - <a href=\"${p.link}\">посилання</a>`;
                 }
             });
         }
